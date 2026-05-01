@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-<title>Heads Up Mob</title>
+<title>TopHat</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#1a1a2e">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -35,8 +35,40 @@
   button { font: inherit; cursor: pointer; border: none; padding: 16px 28px; font-size: clamp(16px, 1.8vw, 22px); border-radius: 12px; background: var(--accent); color: #222; font-weight: 700; margin: 6px; transition: transform .1s; }
   button:hover { transform: scale(1.04); }
   button.secondary { background: #34495e; color: #fff; }
-  .categories { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; max-width: 900px; width: 100%; margin-top: 16px; }
-  .categories button { width: 100%; margin: 0; padding: 24px; }
+  /* ---------- Home screen: deck selector ---------- */
+  .home-actions { width: 100%; max-width: 760px; display: flex; flex-direction: column; gap: 12px; align-items: stretch; margin-top: 8px; }
+  .big-action { width: 100%; padding: 20px; font-size: clamp(18px, 2.4vw, 26px); background: var(--accent); color: #222; font-weight: 800; border-radius: 14px; }
+  .search-wrap { display: flex; }
+  #deckSearch { flex: 1; padding: 14px 18px; font: inherit; font-size: 16px; border-radius: 12px; border: 1px solid #2c3e50; background: rgba(0,0,0,0.25); color: #fff; outline: none; }
+  #deckSearch:focus { border-color: var(--accent); }
+  #deckSearch::placeholder { color: rgba(255,255,255,0.5); }
+  .deck-sections { width: 100%; max-width: 1000px; display: flex; flex-direction: column; gap: 18px; margin-top: 18px; }
+  .deck-section h3 { font-size: 18px; margin: 0 0 10px 4px; opacity: 0.85; text-align: left; font-weight: 700; }
+  .deck-row { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 6px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+  .deck-row .deck-card { flex: 0 0 auto; scroll-snap-align: start; }
+  .deck-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+  .deck-card { width: 100%; padding: 16px; margin: 0; background: #2c3e50; color: #fff; border-radius: 14px; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; text-align: left; cursor: pointer; transition: transform .1s, background .15s; font: inherit; border: none; }
+  .deck-card:hover { background: #34495e; transform: translateY(-2px); }
+  .deck-emoji { font-size: 40px; line-height: 1; }
+  .deck-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .deck-name { font-weight: 800; font-size: 18px; color: var(--accent); }
+  .deck-desc { font-size: 13px; opacity: 0.7; line-height: 1.3; white-space: normal; }
+  .deck-card-featured { min-width: 240px; padding: 20px; background: linear-gradient(135deg, #2c3e50, #1f2c3a); border: 1px solid rgba(241,196,15,0.25); }
+  .deck-card-featured .deck-emoji { font-size: 48px; }
+  .deck-card-compact { min-width: 150px; padding: 12px; }
+  .deck-card-compact .deck-emoji { font-size: 28px; }
+  .deck-card-compact .deck-name { font-size: 15px; }
+  .deck-card-compact .deck-desc { display: none; }
+  .deck-empty { opacity: 0.6; padding: 12px; }
+  .deck-browse-heading { font-size: 14px; opacity: 0.5; text-align: left; margin: 12px 4px 0; text-transform: uppercase; letter-spacing: 1px; }
+  .deck-cat { background: rgba(0,0,0,0.2); border-radius: 12px; padding: 10px 14px; }
+  .deck-cat summary { cursor: pointer; padding: 6px 0; display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 16px; list-style: none; }
+  .deck-cat summary::-webkit-details-marker { display: none; }
+  .deck-cat summary::after { content: "▾"; opacity: 0.5; transition: transform .2s; }
+  .deck-cat[open] summary::after { transform: rotate(180deg); }
+  .deck-cat-count { background: rgba(255,255,255,0.1); font-size: 12px; padding: 2px 8px; border-radius: 10px; opacity: 0.7; }
+  .deck-cat .deck-grid { margin-top: 10px; }
+  .home-settings { width: 100%; max-width: 1000px; margin-top: 24px; display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.06); }
   .word { font-size: clamp(64px, 13vw, 200px); font-weight: 900; line-height: 1.05; padding: 0 20px; pointer-events: none; }
   .timer { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); font-size: clamp(36px, 6vw, 76px); font-weight: 900; padding: 6px 22px; background: rgba(0,0,0,0.35); border-radius: 14px; pointer-events: none; }
   .timer.warn { color: var(--skip); }
@@ -75,12 +107,19 @@
 
 <!-- HOME -->
 <section id="homeScreen" class="screen active">
-  <h1>🎩 Heads Up Mob</h1>
-  <p>Hold the device on your forehead. Teammates shout clues.</p>
-  <p id="controlsHint"><b>Tilt down</b> or <b>tap bottom half</b> = correct &nbsp;·&nbsp; <b>Tilt up</b> or <b>tap top half</b> = skip</p>
-  <p>Pick a category to start a 60-second round.</p>
-  <div class="categories" id="categoryList"></div>
-  <div style="margin-top:24px; display:flex; flex-wrap:wrap; justify-content:center;">
+  <h1>🎩 TopHat</h1>
+  <p>Hold the device on your forehead. Teammates shout clues. Tilt or tap to play.</p>
+
+  <div class="home-actions">
+    <button id="surpriseBtn" class="big-action">🎲 Surprise me</button>
+    <div class="search-wrap">
+      <input id="deckSearch" type="search" placeholder="Search decks…" autocomplete="off" />
+    </div>
+  </div>
+
+  <div id="deckSections" class="deck-sections"></div>
+
+  <div class="home-settings">
     <button class="secondary" id="tiltBtn" style="display:none;">📱 Enable tilt controls</button>
     <button class="secondary" id="muteBtn">🔊 Music On</button>
     <button class="secondary" id="installBtn" style="display:none;">📲 Add to Home Screen</button>
@@ -129,45 +168,207 @@
 </div>
 
 <script>
-// ---------------- WORD LISTS ----------------
-const CATEGORIES = {
-  "🎬 Movies": ["Titanic","Star Wars","The Godfather","Jurassic Park","Frozen","Forrest Gump","The Matrix","Pulp Fiction","Avatar","Toy Story","Shrek","Jaws","Rocky","Gladiator","Inception","The Lion King","Harry Potter","Mean Girls","Home Alone","Back to the Future","Finding Nemo","The Avengers","Pirates of the Caribbean","E.T.","Top Gun","Dirty Dancing","Grease","Casablanca","Goodfellas","Mamma Mia"],
-  "🐘 Animals": ["Elephant","Kangaroo","Penguin","Octopus","Giraffe","Cheetah","Hedgehog","Platypus","Sloth","Walrus","Koala","Flamingo","Hippopotamus","Chameleon","Squirrel","Dolphin","Rhinoceros","Ostrich","Panda","Crocodile","Hummingbird","Tortoise","Meerkat","Llama","Otter","Toucan","Beaver","Lobster","Peacock","Armadillo"],
-  "🌟 Celebrities": ["Beyoncé","Tom Cruise","Oprah Winfrey","Elon Musk","Taylor Swift","David Attenborough","Lady Gaga","Keanu Reeves","Adele","Dwayne Johnson","Rihanna","Ed Sheeran","Will Smith","Jennifer Lawrence","Leonardo DiCaprio","Brad Pitt","Madonna","Snoop Dogg","Ariana Grande","Hugh Jackman","Emma Watson","Drake","Kanye West","Scarlett Johansson","Shakira","Daniel Craig","Zendaya","Harry Styles","Dolly Parton","Idris Elba"],
-  "🎭 Act It Out": ["Brushing teeth","Riding a horse","Climbing a ladder","Swatting a fly","Eating spaghetti","Playing guitar","Tying shoelaces","Driving a car","Catching a ball","Painting a wall","Mowing the lawn","Surfing","Yoga pose","Conducting an orchestra","Boxing","Fishing","Putting on socks","Opening a jar","Skiing","Sneezing","Sword fighting","Ice skating","Knitting","Doing the dishes","Walking a dog","Lifting weights","Vacuuming","Crying","Sleeping","Tightrope walking"],
-  "🍕 Food & Drink": ["Pizza","Sushi","Tacos","Spaghetti","Pancakes","Curry","Hamburger","Croissant","Ramen","Cheesecake","Smoothie","Avocado toast","Fish and chips","Lasagne","Hot dog","Doughnut","Bubble tea","Risotto","Espresso","Margarita","Pad Thai","Cornflakes","Brownie","Paella","Guacamole","Bagel","Tiramisu","Pretzel","Kebab","Pavlova"],
-  "👥 Humans": ["Brooke Wilds","Michel Moraes","Jessie Johnston","Vladislav Denishev","Chikako Suzuki","Hannah Terrill","Adam Silverstein","Sarah Jones","Alex Aspinall","Diana Dvorska","Owain","Dom Huxley","Ant Miller","Kirsty Burgoine","Adam Brown","Ewart Xia","Noel Tock","Vojislav","Aleks Ganev","Leyla","JC Marin","Esther Abraham","Wisdom Hambolu","Iliana Mustafa","Fatima","Rufaro Madamombe","Maria Manolova","Alexis Villegas","Simon","Will Davis","Firdaus Zahari","Sander van Dragt","Mehul Kaklotar","Gianna Legate","Megan Rose","Pam Ribeiro","Than Taintor","Tom J Nowell","Mike Little","Joe Bailey-Roberts","Joe Hoyle","Pawel Mikolajek","Jerico Aragon","Lorna Linke","Joeleen Kennedy","Petya Raykovska","Shipra Sood","Ivan K","Stuart Shields","Jon Ang"]
-};
+// ---------------- DECKS ----------------
+// Each deck has metadata so the home screen can group, feature, and search.
+// Add new decks here; they'll automatically appear in the right category section.
+const DECKS = [
+  {
+    id: "movies",
+    name: "Movies",
+    emoji: "🎬",
+    description: "Iconic films from every era",
+    category: "TV & Film",
+    featured: true,
+    words: ["Titanic","Star Wars","The Godfather","Jurassic Park","Frozen","Forrest Gump","The Matrix","Pulp Fiction","Avatar","Toy Story","Shrek","Jaws","Rocky","Gladiator","Inception","The Lion King","Harry Potter","Mean Girls","Home Alone","Back to the Future","Finding Nemo","The Avengers","Pirates of the Caribbean","E.T.","Top Gun","Dirty Dancing","Grease","Casablanca","Goodfellas","Mamma Mia"]
+  },
+  {
+    id: "animals",
+    name: "Animals",
+    emoji: "🐘",
+    description: "Creatures big, small, and weird",
+    category: "Nature",
+    featured: true,
+    words: ["Elephant","Kangaroo","Penguin","Octopus","Giraffe","Cheetah","Hedgehog","Platypus","Sloth","Walrus","Koala","Flamingo","Hippopotamus","Chameleon","Squirrel","Dolphin","Rhinoceros","Ostrich","Panda","Crocodile","Hummingbird","Tortoise","Meerkat","Llama","Otter","Toucan","Beaver","Lobster","Peacock","Armadillo"]
+  },
+  {
+    id: "celebrities",
+    name: "Celebrities",
+    emoji: "🌟",
+    description: "Famous faces from screen, music, and culture",
+    category: "People",
+    featured: true,
+    words: ["Beyoncé","Tom Cruise","Oprah Winfrey","Elon Musk","Taylor Swift","David Attenborough","Lady Gaga","Keanu Reeves","Adele","Dwayne Johnson","Rihanna","Ed Sheeran","Will Smith","Jennifer Lawrence","Leonardo DiCaprio","Brad Pitt","Madonna","Snoop Dogg","Ariana Grande","Hugh Jackman","Emma Watson","Drake","Kanye West","Scarlett Johansson","Shakira","Daniel Craig","Zendaya","Harry Styles","Dolly Parton","Idris Elba"]
+  },
+  {
+    id: "act-it-out",
+    name: "Act It Out",
+    emoji: "🎭",
+    description: "Charades-style — perform, don't speak",
+    category: "Activities",
+    featured: true,
+    words: ["Brushing teeth","Riding a horse","Climbing a ladder","Swatting a fly","Eating spaghetti","Playing guitar","Tying shoelaces","Driving a car","Catching a ball","Painting a wall","Mowing the lawn","Surfing","Yoga pose","Conducting an orchestra","Boxing","Fishing","Putting on socks","Opening a jar","Skiing","Sneezing","Sword fighting","Ice skating","Knitting","Doing the dishes","Walking a dog","Lifting weights","Vacuuming","Crying","Sleeping","Tightrope walking"]
+  },
+  {
+    id: "food-drink",
+    name: "Food & Drink",
+    emoji: "🍕",
+    description: "Things on plates and in glasses",
+    category: "Lifestyle",
+    featured: false,
+    words: ["Pizza","Sushi","Tacos","Spaghetti","Pancakes","Curry","Hamburger","Croissant","Ramen","Cheesecake","Smoothie","Avocado toast","Fish and chips","Lasagne","Hot dog","Doughnut","Bubble tea","Risotto","Espresso","Margarita","Pad Thai","Cornflakes","Brownie","Paella","Guacamole","Bagel","Tiramisu","Pretzel","Kebab","Pavlova"]
+  },
+  {
+    id: "humans",
+    name: "Humans",
+    emoji: "👥",
+    description: "Faces from the Human Made team",
+    category: "People",
+    featured: false,
+    words: ["Brooke Wilds","Michel Moraes","Jessie Johnston","Vladislav Denishev","Chikako Suzuki","Hannah Terrill","Adam Silverstein","Sarah Jones","Alex Aspinall","Diana Dvorska","Owain","Dom Huxley","Ant Miller","Kirsty Burgoine","Adam Brown","Ewart Xia","Noel Tock","Vojislav","Aleks Ganev","Leyla","JC Marin","Esther Abraham","Wisdom Hambolu","Iliana Mustafa","Fatima","Rufaro Madamombe","Maria Manolova","Alexis Villegas","Simon","Will Davis","Firdaus Zahari","Sander van Dragt","Mehul Kaklotar","Gianna Legate","Megan Rose","Pam Ribeiro","Than Taintor","Tom J Nowell","Mike Little","Joe Bailey-Roberts","Joe Hoyle","Pawel Mikolajek","Jerico Aragon","Lorna Linke","Joeleen Kennedy","Petya Raykovska","Shipra Sood","Ivan K","Stuart Shields","Jon Ang"]
+  }
+];
+
+// Lookup helpers
+const deckById = id => DECKS.find(d => d.id === id);
 
 const ROUND_SECONDS = 60;
 
 const state = {
-  category: null, pool: [], current: null,
+  deckId: null, pool: [], current: null,
   timeLeft: ROUND_SECONDS, gotCount: 0, skipCount: 0,
   history: [], timerId: null, running: false, lastInput: 0,
   tiltEnabled: false, tiltLocked: false
 };
 
+// Recently-played: persist a small list of deck IDs in localStorage.
+const RECENT_KEY = "tophat.recent";
+const RECENT_MAX = 5;
+function getRecentDeckIds() {
+  try {
+    const raw = localStorage.getItem(RECENT_KEY);
+    return raw ? JSON.parse(raw).filter(id => deckById(id)) : [];
+  } catch (_) { return []; }
+}
+function pushRecentDeck(id) {
+  try {
+    const list = [id, ...getRecentDeckIds().filter(x => x !== id)].slice(0, RECENT_MAX);
+    localStorage.setItem(RECENT_KEY, JSON.stringify(list));
+  } catch (_) {}
+}
+
 const $ = id => document.getElementById(id);
 const screens = ["homeScreen","countdownScreen","playScreen","recapScreen"];
 function show(id) { screens.forEach(s => $(s).classList.toggle("active", s === id)); }
 
-// ---------------- HOME ----------------
-function buildHome() {
-  const list = $("categoryList");
-  list.innerHTML = "";
-  Object.keys(CATEGORIES).forEach(cat => {
-    const btn = document.createElement("button");
-    btn.textContent = cat;
-    btn.onclick = () => startCountdown(cat);
-    list.appendChild(btn);
+// ---------------- HOME (deck selector) ----------------
+function deckCard(deck, variant) {
+  const btn = document.createElement("button");
+  btn.className = "deck-card deck-card-" + (variant || "default");
+  btn.dataset.deckId = deck.id;
+  btn.innerHTML = `
+    <div class="deck-emoji">${deck.emoji}</div>
+    <div class="deck-text">
+      <div class="deck-name">${deck.name}</div>
+      <div class="deck-desc">${deck.description}</div>
+    </div>`;
+  btn.addEventListener("click", () => startCountdown(deck.id));
+  return btn;
+}
+
+function renderDecks(filter) {
+  const home = $("deckSections");
+  home.innerHTML = "";
+  const term = (filter || "").trim().toLowerCase();
+
+  // Search mode: flat filtered list, no sections
+  if (term) {
+    const matches = DECKS.filter(d =>
+      d.name.toLowerCase().includes(term) ||
+      d.description.toLowerCase().includes(term) ||
+      d.category.toLowerCase().includes(term)
+    );
+    const sec = document.createElement("section");
+    sec.className = "deck-section";
+    sec.innerHTML = `<h3>${matches.length} result${matches.length === 1 ? "" : "s"}</h3>`;
+    const grid = document.createElement("div");
+    grid.className = "deck-grid";
+    if (matches.length === 0) {
+      grid.innerHTML = `<p class="deck-empty">No decks match "${term}".</p>`;
+    } else {
+      matches.forEach(d => grid.appendChild(deckCard(d)));
+    }
+    sec.appendChild(grid);
+    home.appendChild(sec);
+    return;
+  }
+
+  // Recently played
+  const recent = getRecentDeckIds().map(deckById).filter(Boolean);
+  if (recent.length) {
+    const sec = document.createElement("section");
+    sec.className = "deck-section";
+    sec.innerHTML = `<h3>⭐ Recently played</h3>`;
+    const row = document.createElement("div");
+    row.className = "deck-row";
+    recent.forEach(d => row.appendChild(deckCard(d, "compact")));
+    sec.appendChild(row);
+    home.appendChild(sec);
+  }
+
+  // Featured
+  const featured = DECKS.filter(d => d.featured);
+  if (featured.length) {
+    const sec = document.createElement("section");
+    sec.className = "deck-section";
+    sec.innerHTML = `<h3>✨ Featured</h3>`;
+    const row = document.createElement("div");
+    row.className = "deck-row";
+    featured.forEach(d => row.appendChild(deckCard(d, "featured")));
+    sec.appendChild(row);
+    home.appendChild(sec);
+  }
+
+  // Browse by category — accordion
+  const byCategory = {};
+  DECKS.forEach(d => {
+    (byCategory[d.category] = byCategory[d.category] || []).push(d);
+  });
+  const browseHeader = document.createElement("h3");
+  browseHeader.className = "deck-browse-heading";
+  browseHeader.textContent = "Browse all";
+  home.appendChild(browseHeader);
+
+  Object.keys(byCategory).sort().forEach((cat, idx) => {
+    const sec = document.createElement("details");
+    sec.className = "deck-section deck-cat";
+    sec.open = idx < 2; // First two categories expanded by default
+    const summary = document.createElement("summary");
+    summary.innerHTML = `<span>${cat}</span><span class="deck-cat-count">${byCategory[cat].length}</span>`;
+    sec.appendChild(summary);
+    const grid = document.createElement("div");
+    grid.className = "deck-grid";
+    byCategory[cat].forEach(d => grid.appendChild(deckCard(d)));
+    sec.appendChild(grid);
+    home.appendChild(sec);
   });
 }
 
+function pickRandomDeck() {
+  const d = DECKS[Math.floor(Math.random() * DECKS.length)];
+  startCountdown(d.id);
+}
+
+function buildHome() {
+  renderDecks("");
+}
+
 // ---------------- ROUND FLOW ----------------
-function startCountdown(cat) {
-  state.category = cat;
-  state.pool = shuffle([...CATEGORIES[cat]]);
+function startCountdown(deckId) {
+  const deck = deckById(deckId);
+  if (!deck) return;
+  state.deckId = deckId;
+  state.pool = shuffle([...deck.words]);
+  pushRecentDeck(deckId);
   state.gotCount = 0;
   state.skipCount = 0;
   state.history = [];
@@ -239,7 +440,7 @@ function updateInputModeLabel() {
 }
 
 function nextWord() {
-  if (state.pool.length === 0) state.pool = shuffle([...CATEGORIES[state.category]]);
+  if (state.pool.length === 0) state.pool = shuffle([...deckById(state.deckId).words]);
   state.current = state.pool.pop();
   $("wordDisplay").textContent = state.current;
 }
@@ -302,7 +503,7 @@ document.addEventListener("keydown", e => {
     else if (e.code === "ArrowUp") { e.preventDefault(); markSkip(); }
     else if (e.code === "Escape") endRound();
   } else if ($("recapScreen").classList.contains("active")) {
-    if (e.code === "Space" || e.code === "Enter") startCountdown(state.category);
+    if (e.code === "Space" || e.code === "Enter") startCountdown(state.deckId);
   }
 });
 
@@ -464,8 +665,8 @@ async function tryLockLandscape() {
 }
 
 // ---------------- BUTTONS ----------------
-$("playAgainBtn").onclick = () => startCountdown(state.category);
-$("homeBtn").onclick = () => { show("homeScreen"); music.stop(); };
+$("playAgainBtn").onclick = () => startCountdown(state.deckId);
+$("homeBtn").onclick = () => { show("homeScreen"); music.stop(); $("deckSearch").value = ""; renderDecks(""); };
 $("quitBtn").addEventListener("pointerdown", e => { e.preventDefault(); e.stopPropagation(); if (state.running) endRound(); });
 $("fullscreenBtn").onclick = () => {
   if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
@@ -598,6 +799,10 @@ function shuffle(arr) {
 
 buildHome();
 probeTiltSupport();
+
+// Wire deck-selector controls
+$("surpriseBtn").addEventListener("click", pickRandomDeck);
+$("deckSearch").addEventListener("input", e => renderDecks(e.target.value));
 
 // ---------------- PWA: install prompt + service worker ----------------
 let deferredInstallPrompt = null;

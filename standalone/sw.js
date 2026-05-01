@@ -1,6 +1,6 @@
 // Heads Up Mob — minimal service worker for offline + Android install prompt
 // Bump on every release so the new SW evicts old cached assets.
-const CACHE = 'headsup-mob-v1.6.1';
+const CACHE = 'headsup-mob-v1.7.0';
 const ASSETS = [
   './',
   './game.html',
