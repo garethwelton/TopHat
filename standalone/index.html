@@ -53,8 +53,6 @@
   .deck-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
   .deck-name { font-weight: 800; font-size: 18px; color: var(--accent); }
   .deck-desc { font-size: 13px; opacity: 0.7; line-height: 1.3; white-space: normal; }
-  .deck-card-featured { min-width: 240px; padding: 20px; background: linear-gradient(135deg, #2c3e50, #1f2c3a); border: 1px solid rgba(241,196,15,0.25); }
-  .deck-card-featured .deck-emoji { font-size: 48px; }
   .deck-card-compact { min-width: 150px; padding: 12px; }
   .deck-card-compact .deck-emoji { font-size: 28px; }
   .deck-card-compact .deck-name { font-size: 15px; }
@@ -181,118 +179,125 @@
 // Add new decks here; they'll automatically appear in the right category section.
 const DECKS = [
   // ===== TV & Film =====
-  { id: "movies", name: "Movies", emoji: "🎬", description: "Iconic films from every era", category: "TV & Film", featured: true,
+  { id: "movies", name: "Movies", emoji: "🎬", description: "Iconic films from every era", category: "TV & Film",
     words: ["Titanic","Star Wars","The Godfather","Jurassic Park","Frozen","Forrest Gump","The Matrix","Pulp Fiction","Avatar","Toy Story","Shrek","Jaws","Rocky","Gladiator","Inception","The Lion King","Harry Potter","Mean Girls","Home Alone","Back to the Future","Finding Nemo","The Avengers","Pirates of the Caribbean","E.T.","Top Gun","Dirty Dancing","Grease","Casablanca","Goodfellas","Mamma Mia"] },
-  { id: "movies-80s", name: "80s Movies", emoji: "📼", description: "Big-hair classics of the 1980s", category: "TV & Film", featured: false,
+  { id: "movies-80s", name: "80s Movies", emoji: "📼", description: "Big-hair classics of the 1980s", category: "TV & Film",
     words: ["E.T.","Back to the Future","The Goonies","Ghostbusters","Top Gun","Dirty Dancing","The Breakfast Club","Indiana Jones","Die Hard","Beetlejuice","The Empire Strikes Back","Blade Runner","The Shining","Beverly Hills Cop","Rain Man","Pretty in Pink","Big","Stand By Me","Ferris Bueller's Day Off","The Karate Kid","Predator","Aliens","RoboCop","Fatal Attraction","When Harry Met Sally","Working Girl","Footloose","Flashdance"] },
-  { id: "movies-90s", name: "90s Movies", emoji: "📺", description: "Blockbusters of the 1990s", category: "TV & Film", featured: false,
+  { id: "movies-90s", name: "90s Movies", emoji: "📺", description: "Blockbusters of the 1990s", category: "TV & Film",
     words: ["Pulp Fiction","Forrest Gump","The Matrix","Titanic","Jurassic Park","Toy Story","Home Alone","The Lion King","Independence Day","Fight Club","Goodfellas","Saving Private Ryan","Pretty Woman","Clueless","Mrs Doubtfire","Edward Scissorhands","Groundhog Day","Reservoir Dogs","Trainspotting","The Big Lebowski","American Pie","Speed","The Sixth Sense","Wayne's World","Dumb and Dumber","Notting Hill","Schindler's List","Braveheart"] },
-  { id: "sitcoms", name: "Sitcoms", emoji: "😂", description: "Laugh-track and single-camera classics", category: "TV & Film", featured: true,
+  { id: "sitcoms", name: "Sitcoms", emoji: "😂", description: "Laugh-track and single-camera classics", category: "TV & Film",
     words: ["Friends","Seinfeld","The Office","Parks and Recreation","Brooklyn Nine-Nine","How I Met Your Mother","Cheers","Frasier","Modern Family","Arrested Development","The Big Bang Theory","Fawlty Towers","Blackadder","Peep Show","The IT Crowd","Community","Scrubs","Curb Your Enthusiasm","Schitt's Creek","Veep","Ted Lasso","Will & Grace","30 Rock","Malcolm in the Middle","Mr. Bean","Two and a Half Men","Everybody Loves Raymond","New Girl"] },
-  { id: "disney", name: "Disney Films", emoji: "🏰", description: "Animated classics from the Disney vault", category: "TV & Film", featured: false,
+  { id: "disney", name: "Disney Films", emoji: "🏰", description: "Animated classics from the Disney vault", category: "TV & Film",
     words: ["The Lion King","Frozen","Aladdin","Beauty and the Beast","Snow White","Cinderella","The Little Mermaid","Pocahontas","Mulan","Moana","Tangled","Sleeping Beauty","Bambi","Dumbo","Pinocchio","Peter Pan","101 Dalmatians","The Jungle Book","Lady and the Tramp","Hercules","Tarzan","Lilo and Stitch","Encanto","Robin Hood","The Aristocats","Treasure Planet","Big Hero 6","Wreck-It Ralph"] },
-  { id: "pixar", name: "Pixar", emoji: "💡", description: "From Toy Story to today", category: "TV & Film", featured: false,
+  { id: "pixar", name: "Pixar", emoji: "💡", description: "From Toy Story to today", category: "TV & Film",
     words: ["Toy Story","Finding Nemo","Up","The Incredibles","Wall-E","Monsters Inc","Cars","Ratatouille","Inside Out","Coco","Brave","A Bug's Life","Soul","Onward","Luca","Turning Red","Lightyear","Elemental","Finding Dory","Toy Story 2","Toy Story 3","Cars 2","Monsters University","Toy Story 4"] },
-  { id: "scifi", name: "Sci-Fi", emoji: "🚀", description: "Spaceships, robots, and what-ifs", category: "TV & Film", featured: false,
+  { id: "scifi", name: "Sci-Fi", emoji: "🚀", description: "Spaceships, robots, and what-ifs", category: "TV & Film",
     words: ["Star Wars","Star Trek","Doctor Who","The Matrix","Blade Runner","Interstellar","Inception","Alien","2001: A Space Odyssey","Back to the Future","E.T.","Terminator","Avatar","Stranger Things","Black Mirror","The X-Files","Battlestar Galactica","Firefly","Westworld","The Mandalorian","Dune","Arrival","District 9","Ex Machina","Predator","Independence Day","Men in Black","Total Recall"] },
-  { id: "reality-tv", name: "Reality TV", emoji: "📡", description: "Drama, drama, and a vote-off", category: "TV & Film", featured: false,
+  { id: "reality-tv", name: "Reality TV", emoji: "📡", description: "Drama, drama, and a vote-off", category: "TV & Film",
     words: ["Big Brother","Survivor","The Apprentice","Dancing with the Stars","The Great British Bake Off","Love Island","RuPaul's Drag Race","The Bachelor","MasterChef","Top Chef","Project Runway","America's Got Talent","The Voice","X Factor","Britain's Got Talent","I'm a Celebrity","Married at First Sight","Too Hot to Handle","The Circle","Keeping Up with the Kardashians","Real Housewives","Below Deck","Selling Sunset","Queer Eye","The Amazing Race","Storage Wars","American Idol","Pop Idol"] },
-  { id: "streaming", name: "Streaming Shows", emoji: "🎞️", description: "Binge-worthy series of the streaming era", category: "TV & Film", featured: false,
+  { id: "streaming", name: "Streaming Shows", emoji: "🎞️", description: "Binge-worthy series of the streaming era", category: "TV & Film",
     words: ["Stranger Things","The Crown","Bridgerton","The Witcher","Squid Game","Money Heist","Tiger King","The Queen's Gambit","Ozark","Narcos","House of Cards","Black Mirror","Wednesday","Lupin","The Mandalorian","WandaVision","Loki","The Boys","Succession","Ted Lasso","Severance","The Bear","Yellowstone","Game of Thrones","House of the Dragon","The Last of Us","Dark","Peaky Blinders"] },
-  { id: "james-bond", name: "James Bond", emoji: "🍸", description: "007 across the eras", category: "TV & Film", featured: false,
+  { id: "james-bond", name: "James Bond", emoji: "🍸", description: "007 across the eras", category: "TV & Film",
     words: ["Goldfinger","Dr. No","Casino Royale","Skyfall","Spectre","No Time to Die","GoldenEye","Tomorrow Never Dies","The World Is Not Enough","Die Another Day","Quantum of Solace","Octopussy","Moonraker","Live and Let Die","From Russia with Love","Thunderball","You Only Live Twice","On Her Majesty's Secret Service","Diamonds Are Forever","The Spy Who Loved Me","For Your Eyes Only","A View to a Kill","The Living Daylights","Licence to Kill"] },
-  { id: "marvel", name: "Marvel Heroes", emoji: "🦸", description: "Avengers, X-Men, and beyond", category: "TV & Film", featured: false,
+  { id: "marvel", name: "Marvel Heroes", emoji: "🦸", description: "Avengers, X-Men, and beyond", category: "TV & Film",
     words: ["Iron Man","Captain America","Thor","Hulk","Black Widow","Hawkeye","Spider-Man","Doctor Strange","Black Panther","Scarlet Witch","Vision","Wolverine","Deadpool","Captain Marvel","Ant-Man","The Wasp","Falcon","Winter Soldier","Star-Lord","Gamora","Rocket","Groot","Drax","Loki","Nick Fury","Daredevil","Punisher","She-Hulk"] },
-  { id: "star-wars", name: "Star Wars", emoji: "⚔️", description: "Characters from a galaxy far, far away", category: "TV & Film", featured: false,
+  { id: "star-wars", name: "Star Wars", emoji: "⚔️", description: "Characters from a galaxy far, far away", category: "TV & Film",
     words: ["Luke Skywalker","Darth Vader","Han Solo","Princess Leia","Yoda","Obi-Wan Kenobi","Chewbacca","R2-D2","C-3PO","Boba Fett","Mace Windu","Padmé Amidala","Anakin Skywalker","Jabba the Hutt","Emperor Palpatine","Rey","Finn","Poe Dameron","Kylo Ren","BB-8","The Mandalorian","Grogu","Ahsoka Tano","General Grievous","Darth Maul","Stormtrooper","Ewok","Wookiee"] },
-  { id: "harry-potter", name: "Harry Potter", emoji: "⚡", description: "Witches, wizards, and a school called Hogwarts", category: "TV & Film", featured: false,
+  { id: "harry-potter", name: "Harry Potter", emoji: "⚡", description: "Witches, wizards, and a school called Hogwarts", category: "TV & Film",
     words: ["Harry Potter","Hermione Granger","Ron Weasley","Albus Dumbledore","Severus Snape","Lord Voldemort","Hagrid","Draco Malfoy","Sirius Black","Professor McGonagall","Bellatrix Lestrange","Luna Lovegood","Neville Longbottom","Ginny Weasley","Fred Weasley","George Weasley","Dobby","Hedwig","Buckbeak","Nearly Headless Nick","Moaning Myrtle","Cedric Diggory","Cho Chang","Lucius Malfoy","Remus Lupin","Mad-Eye Moody","Argus Filch","Rita Skeeter"] },
-  { id: "disney-villains", name: "Disney Villains", emoji: "😈", description: "The bad guys you love to hate", category: "TV & Film", featured: false,
+  { id: "disney-villains", name: "Disney Villains", emoji: "😈", description: "The bad guys you love to hate", category: "TV & Film",
     words: ["Maleficent","Cruella de Vil","Ursula","Scar","Jafar","Captain Hook","The Evil Queen","Hades","Gaston","Mother Gothel","Lady Tremaine","Shere Khan","Yzma","Shan Yu","Frollo","Sid","Stinky Pete","Lots-O","Syndrome","Randall","Hopper","Charles Muntz","Dr. Facilier","Tamatoa"] },
 
   // ===== Nature =====
-  { id: "animals", name: "Animals", emoji: "🐘", description: "Creatures big, small, and weird", category: "Nature", featured: true,
+  { id: "animals", name: "Animals", emoji: "🐘", description: "Creatures big, small, and weird", category: "Nature",
     words: ["Elephant","Kangaroo","Penguin","Octopus","Giraffe","Cheetah","Hedgehog","Platypus","Sloth","Walrus","Koala","Flamingo","Hippopotamus","Chameleon","Squirrel","Dolphin","Rhinoceros","Ostrich","Panda","Crocodile","Hummingbird","Tortoise","Meerkat","Llama","Otter","Toucan","Beaver","Lobster","Peacock","Armadillo"] },
-  { id: "sea-creatures", name: "Sea Creatures", emoji: "🐙", description: "What lives beneath the waves", category: "Nature", featured: false,
+  { id: "sea-creatures", name: "Sea Creatures", emoji: "🐙", description: "What lives beneath the waves", category: "Nature",
     words: ["Shark","Dolphin","Whale","Octopus","Jellyfish","Starfish","Sea Turtle","Crab","Lobster","Stingray","Eel","Seahorse","Anglerfish","Pufferfish","Clownfish","Manta Ray","Killer Whale","Blue Whale","Hammerhead","Great White","Sperm Whale","Narwhal","Walrus","Sea Lion","Manatee","Squid","Cuttlefish","Coral"] },
-  { id: "birds", name: "Birds", emoji: "🦜", description: "Feathered, beaked, and flighted", category: "Nature", featured: false,
+  { id: "birds", name: "Birds", emoji: "🦜", description: "Feathered, beaked, and flighted", category: "Nature",
     words: ["Eagle","Owl","Parrot","Penguin","Flamingo","Swan","Peacock","Hummingbird","Robin","Sparrow","Pigeon","Dove","Crow","Raven","Vulture","Falcon","Hawk","Kestrel","Toucan","Pelican","Heron","Stork","Kingfisher","Woodpecker","Cuckoo","Magpie","Ostrich","Emu"] },
-  { id: "dinosaurs", name: "Dinosaurs", emoji: "🦖", description: "Long-extinct, still terrifying", category: "Nature", featured: false,
+  { id: "dinosaurs", name: "Dinosaurs", emoji: "🦖", description: "Long-extinct, still terrifying", category: "Nature",
     words: ["Tyrannosaurus Rex","Stegosaurus","Triceratops","Velociraptor","Brontosaurus","Diplodocus","Spinosaurus","Pterodactyl","Brachiosaurus","Allosaurus","Ankylosaurus","Iguanodon","Parasaurolophus","Pachycephalosaurus","Compsognathus","Gallimimus","Deinonychus","Mosasaurus","Plesiosaurus","Megalodon","Archaeopteryx","Dilophosaurus","Carnotaurus","Apatosaurus"] },
-  { id: "plants", name: "Plants & Trees", emoji: "🌳", description: "Things that grow", category: "Nature", featured: false,
+  { id: "plants", name: "Plants & Trees", emoji: "🌳", description: "Things that grow", category: "Nature",
     words: ["Oak","Pine","Maple","Willow","Cherry Blossom","Bamboo","Cactus","Rose","Sunflower","Tulip","Daffodil","Daisy","Orchid","Lily","Lavender","Fern","Ivy","Holly","Mistletoe","Palm Tree","Apple Tree","Fig Tree","Olive Tree","Eucalyptus","Redwood","Birch","Yew","Bonsai"] },
 
   // ===== People =====
-  { id: "celebrities", name: "Celebrities", emoji: "🌟", description: "Famous faces from screen, music, and culture", category: "People", featured: true,
+  { id: "celebrities", name: "Celebrities", emoji: "🌟", description: "Famous faces from screen, music, and culture", category: "People",
     words: ["Beyoncé","Tom Cruise","Oprah Winfrey","Elon Musk","Taylor Swift","David Attenborough","Lady Gaga","Keanu Reeves","Adele","Dwayne Johnson","Rihanna","Ed Sheeran","Will Smith","Jennifer Lawrence","Leonardo DiCaprio","Brad Pitt","Madonna","Snoop Dogg","Ariana Grande","Hugh Jackman","Emma Watson","Drake","Kanye West","Scarlett Johansson","Shakira","Daniel Craig","Zendaya","Harry Styles","Dolly Parton","Idris Elba"] },
-  { id: "humans", name: "Humans", emoji: "👥", description: "Faces from the Human Made team", category: "People", featured: false,
+  { id: "humans", name: "Humans", emoji: "👥", description: "Faces from the Human Made team", category: "People",
     words: ["Brooke Wilds","Michel Moraes","Jessie Johnston","Vladislav Denishev","Chikako Suzuki","Hannah Terrill","Adam Silverstein","Sarah Jones","Alex Aspinall","Diana Dvorska","Owain","Dom Huxley","Ant Miller","Kirsty Burgoine","Adam Brown","Ewart Xia","Noel Tock","Vojislav","Aleks Ganev","Leyla","JC Marin","Esther Abraham","Wisdom Hambolu","Iliana Mustafa","Fatima","Rufaro Madamombe","Maria Manolova","Alexis Villegas","Simon","Will Davis","Firdaus Zahari","Sander van Dragt","Mehul Kaklotar","Gianna Legate","Megan Rose","Pam Ribeiro","Than Taintor","Tom J Nowell","Mike Little","Joe Bailey-Roberts","Joe Hoyle","Pawel Mikolajek","Jerico Aragon","Lorna Linke","Joeleen Kennedy","Petya Raykovska","Shipra Sood","Ivan K","Stuart Shields","Jon Ang"] },
-  { id: "athletes", name: "Athletes", emoji: "🏆", description: "Sporting greats from across the world", category: "People", featured: false,
+  { id: "athletes", name: "Athletes", emoji: "🏆", description: "Sporting greats from across the world", category: "People",
     words: ["Lionel Messi","Cristiano Ronaldo","LeBron James","Michael Jordan","Serena Williams","Roger Federer","Tiger Woods","Usain Bolt","Muhammad Ali","Pelé","Diego Maradona","David Beckham","Tom Brady","Lewis Hamilton","Ayrton Senna","Michael Phelps","Simone Biles","Kobe Bryant","Stephen Curry","Wayne Gretzky","Babe Ruth","Mike Tyson","Conor McGregor","Andy Murray","Rafael Nadal","Novak Djokovic","Mo Farah","Naomi Osaka"] },
-  { id: "historical", name: "Historical Figures", emoji: "📜", description: "World-changers across the centuries", category: "People", featured: false,
+  { id: "historical", name: "Historical Figures", emoji: "📜", description: "World-changers across the centuries", category: "People",
     words: ["Albert Einstein","Isaac Newton","Marie Curie","Charles Darwin","Galileo","Leonardo da Vinci","Napoleon","Julius Caesar","Cleopatra","Alexander the Great","Genghis Khan","Winston Churchill","Abraham Lincoln","George Washington","Thomas Jefferson","Martin Luther King Jr","Mahatma Gandhi","Nelson Mandela","Mother Teresa","William Shakespeare","Christopher Columbus","Joan of Arc","Anne Frank","Mozart","Beethoven","Pablo Picasso","Vincent van Gogh","Frida Kahlo"] },
-  { id: "authors", name: "Authors", emoji: "📚", description: "Writers from around the world", category: "People", featured: false,
+  { id: "authors", name: "Authors", emoji: "📚", description: "Writers from around the world", category: "People",
     words: ["William Shakespeare","Jane Austen","Charles Dickens","J.K. Rowling","Stephen King","Agatha Christie","Roald Dahl","Dr. Seuss","Mark Twain","Ernest Hemingway","F. Scott Fitzgerald","George Orwell","C.S. Lewis","J.R.R. Tolkien","Lewis Carroll","Oscar Wilde","Edgar Allan Poe","Maya Angelou","Toni Morrison","Margaret Atwood","Neil Gaiman","Terry Pratchett","Douglas Adams","Hans Christian Andersen","Brothers Grimm","Beatrix Potter","Haruki Murakami","Gabriel García Márquez"] },
-  { id: "comedians", name: "Comedians", emoji: "🎙️", description: "Stand-up legends and screen funny people", category: "People", featured: false,
+  { id: "comedians", name: "Comedians", emoji: "🎙️", description: "Stand-up legends and screen funny people", category: "People",
     words: ["Eddie Murphy","Robin Williams","Jim Carrey","Adam Sandler","Will Ferrell","Steve Martin","John Cleese","Rowan Atkinson","Ricky Gervais","Sarah Silverman","Tina Fey","Amy Poehler","Ellen DeGeneres","Chris Rock","Dave Chappelle","Kevin Hart","Trevor Noah","John Mulaney","Bill Burr","Hannah Gadsby","Jerry Seinfeld","Steve Carell","Mike Myers","Jamie Foxx","Conan O'Brien","Jimmy Fallon","Stephen Colbert","Jon Stewart"] },
-  { id: "royals", name: "Famous Royals", emoji: "👑", description: "Crowns and dynasties around the world", category: "People", featured: false,
+  { id: "royals", name: "Famous Royals", emoji: "👑", description: "Crowns and dynasties around the world", category: "People",
     words: ["Queen Elizabeth II","King Charles III","Princess Diana","Prince William","Prince Harry","Henry VIII","Queen Victoria","Marie Antoinette","Louis XIV","Cleopatra","Catherine the Great","Empress Sisi","Genghis Khan","Tutankhamun","Nefertiti","Princess Grace of Monaco","Queen Rania of Jordan","Felipe VI of Spain","Margrethe of Denmark","Queen Beatrix","Emperor Akihito","Charlemagne","Tsar Nicholas II","Mary Queen of Scots","Anne Boleyn","Charles I","Frederick the Great","Catherine de' Medici"] },
-  { id: "inventors", name: "Inventors & Scientists", emoji: "🔬", description: "Great minds and the things they made", category: "People", featured: false,
+  { id: "inventors", name: "Inventors & Scientists", emoji: "🔬", description: "Great minds and the things they made", category: "People",
     words: ["Thomas Edison","Nikola Tesla","Alexander Graham Bell","Henry Ford","Steve Jobs","Bill Gates","Tim Berners-Lee","James Dyson","Wright Brothers","Benjamin Franklin","George Stephenson","James Watt","Eli Whitney","Samuel Morse","Marie Curie","Galileo","Archimedes","Isaac Newton","Albert Einstein","Stephen Hawking","Ada Lovelace","Charles Babbage","Alan Turing","Hedy Lamarr","Louis Pasteur","Jonas Salk","Rosalind Franklin","Carl Sagan"] },
-  { id: "pop-stars", name: "Pop Stars", emoji: "🎵", description: "Chart-topping voices", category: "People", featured: false,
+  { id: "pop-stars", name: "Pop Stars", emoji: "🎵", description: "Chart-topping voices", category: "People",
     words: ["Taylor Swift","Beyoncé","Madonna","Michael Jackson","Lady Gaga","Adele","Rihanna","Ariana Grande","Britney Spears","Justin Bieber","Justin Timberlake","Christina Aguilera","Mariah Carey","Whitney Houston","Prince","Elton John","George Michael","Kylie Minogue","Spice Girls","Backstreet Boys","NSYNC","Take That","One Direction","BTS","Olivia Rodrigo","Billie Eilish","Dua Lipa","Harry Styles"] },
-  { id: "rock-legends", name: "Rock Legends", emoji: "🎸", description: "Bands and artists that shook the world", category: "People", featured: false,
+  { id: "rock-legends", name: "Rock Legends", emoji: "🎸", description: "Bands and artists that shook the world", category: "People",
     words: ["The Beatles","The Rolling Stones","Led Zeppelin","Pink Floyd","Queen","AC/DC","Guns N' Roses","Metallica","Nirvana","The Who","David Bowie","Bruce Springsteen","Bob Dylan","Jimi Hendrix","Eric Clapton","Aerosmith","Black Sabbath","Iron Maiden","Deep Purple","Fleetwood Mac","The Doors","U2","Foo Fighters","Red Hot Chili Peppers","Pearl Jam","Radiohead","Oasis","Coldplay"] },
-  { id: "hip-hop", name: "Hip-Hop Artists", emoji: "🎧", description: "Rappers and producers across decades", category: "People", featured: false,
+  { id: "hip-hop", name: "Hip-Hop Artists", emoji: "🎧", description: "Rappers and producers across decades", category: "People",
     words: ["Jay-Z","Kanye West","Eminem","Drake","Kendrick Lamar","Snoop Dogg","Dr. Dre","Tupac","Notorious B.I.G.","Nas","Ice Cube","Ice-T","LL Cool J","Run-DMC","Public Enemy","Wu-Tang Clan","Beastie Boys","Missy Elliott","Lauryn Hill","Nicki Minaj","Cardi B","Megan Thee Stallion","Lil Wayne","50 Cent","J Cole","Travis Scott","Post Malone","A$AP Rocky"] },
 
   // ===== Activities =====
-  { id: "act-it-out", name: "Act It Out", emoji: "🎭", description: "Charades-style — perform, don't speak", category: "Activities", featured: true,
+  { id: "act-it-out", name: "Act It Out", emoji: "🎭", description: "Charades-style — perform, don't speak", category: "Activities",
     words: ["Brushing teeth","Riding a horse","Climbing a ladder","Swatting a fly","Eating spaghetti","Playing guitar","Tying shoelaces","Driving a car","Catching a ball","Painting a wall","Mowing the lawn","Surfing","Yoga pose","Conducting an orchestra","Boxing","Fishing","Putting on socks","Opening a jar","Skiing","Sneezing","Sword fighting","Ice skating","Knitting","Doing the dishes","Walking a dog","Lifting weights","Vacuuming","Crying","Sleeping","Tightrope walking"] },
-  { id: "olympic-sports", name: "Olympic Sports", emoji: "🏅", description: "Going for gold", category: "Activities", featured: false,
+  { id: "olympic-sports", name: "Olympic Sports", emoji: "🏅", description: "Going for gold", category: "Activities",
     words: ["Swimming","Athletics","Gymnastics","Diving","Cycling","Rowing","Sailing","Boxing","Wrestling","Judo","Taekwondo","Fencing","Archery","Shooting","Equestrian","Tennis","Table Tennis","Badminton","Volleyball","Beach Volleyball","Basketball","Football","Hockey","Handball","Rugby Sevens","Triathlon","Pentathlon","Marathon"] },
-  { id: "hobbies", name: "Hobbies", emoji: "🧶", description: "How people spend their weekends", category: "Activities", featured: false,
+  { id: "hobbies", name: "Hobbies", emoji: "🧶", description: "How people spend their weekends", category: "Activities",
     words: ["Painting","Knitting","Crochet","Sewing","Pottery","Woodworking","Gardening","Baking","Cooking","Reading","Writing","Photography","Birdwatching","Stamp Collecting","Coin Collecting","Model Building","Origami","Calligraphy","Yoga","Pilates","Running","Hiking","Camping","Fishing","Astronomy","Chess","Crossword","Sudoku"] },
-  { id: "dance-moves", name: "Dance Moves", emoji: "💃", description: "Floor-fillers and party staples", category: "Activities", featured: false,
+  { id: "dance-moves", name: "Dance Moves", emoji: "💃", description: "Floor-fillers and party staples", category: "Activities",
     words: ["The Twist","The Macarena","The Charleston","The Tango","The Foxtrot","The Waltz","The Jive","The Salsa","The Samba","The Cha Cha","The Floss","The Dab","Gangnam Style","The Robot","The Moonwalk","The Worm","Breakdance","Vogue","Riverdance","The YMCA","The Locomotion","The Hustle","The Sprinkler","The Lawnmower"] },
-  { id: "yoga-poses", name: "Yoga Poses", emoji: "🧘", description: "Breathe in, hold, breathe out", category: "Activities", featured: false,
+  { id: "yoga-poses", name: "Yoga Poses", emoji: "🧘", description: "Breathe in, hold, breathe out", category: "Activities",
     words: ["Downward Dog","Warrior","Tree Pose","Cobra","Child's Pose","Mountain Pose","Lotus","Bridge","Plank","Crow Pose","Eagle Pose","Pigeon","Triangle","Half Moon","Cat-Cow","Sun Salutation","Corpse Pose","Camel","Boat Pose","Chair Pose","Forward Fold","Headstand","Handstand","Shoulder Stand"] },
-  { id: "board-games", name: "Board Games", emoji: "🎲", description: "Tabletop classics and modern hits", category: "Activities", featured: false,
+  { id: "board-games", name: "Board Games", emoji: "🎲", description: "Tabletop classics and modern hits", category: "Activities",
     words: ["Monopoly","Scrabble","Cluedo","Risk","Settlers of Catan","Ticket to Ride","Pictionary","Trivial Pursuit","Chess","Backgammon","Checkers","Connect Four","Battleship","Operation","Mouse Trap","Snakes and Ladders","Sorry","Yahtzee","Boggle","Articulate","Codenames","Carcassonne","Pandemic","Wingspan","Azul","Splendor","Dixit","Jenga"] },
-  { id: "video-games", name: "Video Games", emoji: "🎮", description: "From Pac-Man to Fortnite", category: "Activities", featured: false,
+  { id: "video-games", name: "Video Games", emoji: "🎮", description: "From Pac-Man to Fortnite", category: "Activities",
     words: ["Mario","Sonic","Pokemon","Zelda","Minecraft","Fortnite","Roblox","Call of Duty","Grand Theft Auto","FIFA","NBA 2K","Mortal Kombat","Street Fighter","Tekken","Tetris","Pac-Man","Donkey Kong","Halo","Skyrim","World of Warcraft","Overwatch","Among Us","Animal Crossing","The Sims","Doom","Resident Evil","Final Fantasy","Counter-Strike"] },
-  { id: "card-games", name: "Card Games", emoji: "🃏", description: "Decks, suits, and hands", category: "Activities", featured: false,
+  { id: "card-games", name: "Card Games", emoji: "🃏", description: "Decks, suits, and hands", category: "Activities",
     words: ["Poker","Blackjack","Bridge","Solitaire","Hearts","Spades","Rummy","Gin Rummy","Crazy Eights","Go Fish","Snap","Old Maid","War","Cheat","Uno","Phase 10","Skip-Bo","Cribbage","Pinochle","Canasta","Texas Hold'em","Whist","Sevens","Pontoon"] },
 
   // ===== Lifestyle =====
-  { id: "food-drink", name: "Food & Drink", emoji: "🍕", description: "Things on plates and in glasses", category: "Lifestyle", featured: false,
+  { id: "food-drink", name: "Food & Drink", emoji: "🍕", description: "Things on plates and in glasses", category: "Lifestyle",
     words: ["Pizza","Sushi","Tacos","Spaghetti","Pancakes","Curry","Hamburger","Croissant","Ramen","Cheesecake","Smoothie","Avocado toast","Fish and chips","Lasagne","Hot dog","Doughnut","Bubble tea","Risotto","Espresso","Margarita","Pad Thai","Cornflakes","Brownie","Paella","Guacamole","Bagel","Tiramisu","Pretzel","Kebab","Pavlova"] },
-  { id: "cocktails", name: "Cocktails", emoji: "🍹", description: "What's in your glass tonight", category: "Lifestyle", featured: false,
+  { id: "cocktails", name: "Cocktails", emoji: "🍹", description: "What's in your glass tonight", category: "Lifestyle",
     words: ["Margarita","Mojito","Martini","Old Fashioned","Negroni","Manhattan","Bloody Mary","Pina Colada","Daiquiri","Cosmopolitan","Long Island Iced Tea","Whiskey Sour","Espresso Martini","Aperol Spritz","Gin and Tonic","Mai Tai","Moscow Mule","French 75","Sidecar","Sazerac","Tom Collins","White Russian","Caipirinha","Bellini","Mimosa","Tequila Sunrise","Sex on the Beach","Pimm's Cup"] },
-  { id: "desserts", name: "Desserts", emoji: "🍰", description: "Sweet finishers from around the world", category: "Lifestyle", featured: false,
+  { id: "desserts", name: "Desserts", emoji: "🍰", description: "Sweet finishers from around the world", category: "Lifestyle",
     words: ["Chocolate Cake","Cheesecake","Tiramisu","Crème Brûlée","Apple Pie","Pumpkin Pie","Pavlova","Sticky Toffee Pudding","Eton Mess","Bread Pudding","Trifle","Banoffee Pie","Lemon Tart","Macaron","Profiteroles","Eclair","Cannoli","Gelato","Ice Cream","Sorbet","Mousse","Panna Cotta","Crumble","Treacle Tart","Black Forest Gateau","Red Velvet Cake","Carrot Cake","Victoria Sponge"] },
-  { id: "coffee", name: "Coffee Orders", emoji: "☕", description: "How you take it", category: "Lifestyle", featured: false,
+  { id: "coffee", name: "Coffee Orders", emoji: "☕", description: "How you take it", category: "Lifestyle",
     words: ["Espresso","Americano","Latte","Cappuccino","Macchiato","Mocha","Flat White","Cortado","Affogato","Frappuccino","Iced Latte","Iced Coffee","Cold Brew","Drip Coffee","French Press","Pour Over","Turkish Coffee","Vienna Coffee","Café au Lait","Café Crème","Doppio","Lungo","Ristretto","Decaf"] },
-  { id: "cars", name: "Cars", emoji: "🚗", description: "Marques from luxury to economy", category: "Lifestyle", featured: false,
+  { id: "cars", name: "Cars", emoji: "🚗", description: "Marques from luxury to economy", category: "Lifestyle",
     words: ["Ferrari","Lamborghini","Porsche","BMW","Mercedes-Benz","Audi","Tesla","Rolls-Royce","Bentley","Aston Martin","Jaguar","Land Rover","Mini","Volkswagen","Volvo","Toyota","Honda","Nissan","Hyundai","Kia","Ford","Chevrolet","Dodge","Cadillac","Bugatti","McLaren","Maserati","Alfa Romeo"] },
-  { id: "brands", name: "Brands", emoji: "🏷️", description: "Logos you'd know anywhere", category: "Lifestyle", featured: false,
+  { id: "brands", name: "Brands", emoji: "🏷️", description: "Logos you'd know anywhere", category: "Lifestyle",
     words: ["Apple","Google","Amazon","Microsoft","Nike","Adidas","Coca-Cola","Pepsi","McDonald's","Starbucks","Disney","Netflix","Spotify","Tesla","Samsung","Sony","Nintendo","Lego","IKEA","H&M","Zara","Gucci","Louis Vuitton","Chanel","Tiffany","Rolex","Shell","BP"] },
-  { id: "tech-gadgets", name: "Tech Gadgets", emoji: "📱", description: "Devices and toys", category: "Lifestyle", featured: false,
+  { id: "tech-gadgets", name: "Tech Gadgets", emoji: "📱", description: "Devices and toys", category: "Lifestyle",
     words: ["iPhone","iPad","MacBook","Apple Watch","AirPods","Kindle","PlayStation","Xbox","Nintendo Switch","Roku","Chromecast","Alexa","Google Home","Fitbit","GoPro","Drone","Smart TV","Bluetooth Speaker","Wireless Charger","Smart Doorbell","Robot Vacuum","VR Headset","Smartwatch","Power Bank"] },
-  { id: "christmas", name: "Christmas Things", emoji: "🎄", description: "Trees, treats, and traditions", category: "Lifestyle", featured: false,
+  { id: "christmas", name: "Christmas Things", emoji: "🎄", description: "Trees, treats, and traditions", category: "Lifestyle",
     words: ["Santa Claus","Reindeer","Christmas Tree","Mistletoe","Snowman","Stockings","Presents","Wrapping Paper","Christmas Pudding","Mince Pie","Turkey Dinner","Yule Log","Carol Singers","Sleigh","Elves","North Pole","Christmas Eve","Boxing Day","Advent Calendar","Christmas Lights","Tinsel","Bauble","Star","Wreath","Christmas Card","Cracker","Frosty the Snowman","Rudolph"] },
-  { id: "holiday-spots", name: "Holiday Spots", emoji: "🏖️", description: "Bucket-list destinations", category: "Lifestyle", featured: false,
+  { id: "holiday-spots", name: "Holiday Spots", emoji: "🏖️", description: "Bucket-list destinations", category: "Lifestyle",
     words: ["Maldives","Bali","Hawaii","Bahamas","Caribbean","Mediterranean","Greek Islands","Spain","Italy","France","Portugal","Croatia","Thailand","Vietnam","Australia","New Zealand","Costa Rica","Mexico","Brazil","Cuba","Iceland","Norway","Switzerland","Japan","Morocco","Kenya","South Africa","Peru"] },
-  { id: "cities", name: "Famous Cities", emoji: "🏙️", description: "Capitals, hubs, and metropolises", category: "Lifestyle", featured: false,
+  { id: "cities", name: "Famous Cities", emoji: "🏙️", description: "Capitals, hubs, and metropolises", category: "Lifestyle",
     words: ["London","Paris","New York","Tokyo","Rome","Barcelona","Amsterdam","Berlin","Sydney","Dubai","Singapore","Hong Kong","Bangkok","Istanbul","Cairo","Cape Town","Rio de Janeiro","Buenos Aires","Mexico City","Toronto","Vancouver","Los Angeles","San Francisco","Chicago","Boston","Seattle","Miami","Las Vegas"] },
-  { id: "countries", name: "Countries", emoji: "🌍", description: "Nations of the world", category: "Lifestyle", featured: false,
+  { id: "countries", name: "Countries", emoji: "🌍", description: "Nations of the world", category: "Lifestyle",
     words: ["United Kingdom","United States","France","Germany","Italy","Spain","Japan","China","India","Brazil","Australia","Canada","Russia","Mexico","South Africa","Egypt","Argentina","Sweden","Norway","Netherlands","Switzerland","Greece","Turkey","South Korea","Thailand","Vietnam","Indonesia","New Zealand"] },
-  { id: "landmarks", name: "Landmarks", emoji: "🗽", description: "World wonders and famous sights", category: "Lifestyle", featured: false,
+  { id: "landmarks", name: "Landmarks", emoji: "🗽", description: "World wonders and famous sights", category: "Lifestyle",
     words: ["Eiffel Tower","Big Ben","Statue of Liberty","Great Wall of China","Pyramids of Giza","Colosseum","Taj Mahal","Machu Picchu","Christ the Redeemer","Sydney Opera House","Tower Bridge","Buckingham Palace","Empire State Building","Golden Gate Bridge","Mount Rushmore","Niagara Falls","Stonehenge","Acropolis","Sagrada Familia","Leaning Tower of Pisa","Mount Everest","Mount Kilimanjaro","Grand Canyon","Angkor Wat","Burj Khalifa","Petra","Hagia Sophia","Vatican City"] }
 ];
 
 // Lookup helpers
-const deckById = id => DECKS.find(d => d.id === id);
+const DECK_MAP = new Map(DECKS.map(d => [d.id, d]));
+const deckById = id => DECK_MAP.get(id);
+const BY_CATEGORY = (() => {
+  const m = {};
+  DECKS.forEach(d => (m[d.category] = m[d.category] || []).push(d));
+  return m;
+})();
+const SORTED_CATS = Object.keys(BY_CATEGORY).sort();
 
 const ROUND_SECONDS = 60;
 
@@ -356,7 +361,10 @@ function renderDecks(filter) {
     const grid = document.createElement("div");
     grid.className = "deck-grid";
     if (matches.length === 0) {
-      grid.innerHTML = `<p class="deck-empty">No decks match "${term}".</p>`;
+      const msg = document.createElement("p");
+      msg.className = "deck-empty";
+      msg.textContent = `No decks match "${term}".`;
+      grid.appendChild(msg);
     } else {
       matches.forEach(d => grid.appendChild(deckCard(d)));
     }
@@ -379,26 +387,22 @@ function renderDecks(filter) {
   }
 
   // Browse by category — accordion
-  const byCategory = {};
-  DECKS.forEach(d => {
-    (byCategory[d.category] = byCategory[d.category] || []).push(d);
-  });
   const browseHeader = document.createElement("h3");
   browseHeader.className = "deck-browse-heading";
   browseHeader.textContent = "Browse all";
   home.appendChild(browseHeader);
 
-  Object.keys(byCategory).sort().forEach(cat => {
+  SORTED_CATS.forEach(cat => {
     const sec = document.createElement("details");
     sec.className = "deck-section deck-cat";
     sec.dataset.cat = cat;
     sec.open = false; // All categories collapsed by default
     const summary = document.createElement("summary");
-    summary.innerHTML = `<span>${cat}</span><span class="deck-cat-count">${byCategory[cat].length}</span>`;
+    summary.innerHTML = `<span>${cat}</span><span class="deck-cat-count">${BY_CATEGORY[cat].length}</span>`;
     sec.appendChild(summary);
     const grid = document.createElement("div");
     grid.className = "deck-grid";
-    byCategory[cat].forEach(d => grid.appendChild(deckCard(d)));
+    BY_CATEGORY[cat].forEach(d => grid.appendChild(deckCard(d)));
     sec.appendChild(grid);
     home.appendChild(sec);
   });
@@ -529,6 +533,7 @@ function markSkip() {
 function endRound() {
   state.running = false;
   clearInterval(state.timerId);
+  music.stop();
   buzzer();
   $("finalGot").textContent = state.gotCount;
   $("finalSkip").textContent = state.skipCount;
@@ -619,9 +624,10 @@ function onMotion(e) {
 }
 
 // Recalibrate baseline on screen rotation (handheld pose tends to change)
-window.addEventListener("orientationchange", () => { neutralZ = null; smoothedZ = null; });
 if (screen.orientation && screen.orientation.addEventListener) {
   screen.orientation.addEventListener("change", () => { neutralZ = null; smoothedZ = null; });
+} else {
+  window.addEventListener("orientationchange", () => { neutralZ = null; smoothedZ = null; });
 }
 
 function attachMotionListener() {
@@ -727,6 +733,7 @@ $("muteBtn").onclick = () => {
   music.muted = !music.muted;
   $("muteBtn").textContent = music.muted ? "🔇 Music Off" : "🔊 Music On";
   if (music.muted) music.stop();
+  try { localStorage.setItem("tophat.muted", music.muted ? "1" : "0"); } catch (_) {}
 };
 
 // ---------------- AUDIO ----------------
@@ -782,13 +789,16 @@ const music = (() => {
     o.connect(g).connect(masterGain);
     o.start(time); o.stop(time + 0.2);
   }
-  function playHat(time) {
-    const bufferSize = audioCtx.sampleRate * 0.05;
-    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-    const data = buffer.getChannelData(0);
+  const HAT_BUFFER = (() => {
+    const bufferSize = Math.round(audioCtx.sampleRate * 0.05);
+    const buf = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buf.getChannelData(0);
     for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+    return buf;
+  })();
+  function playHat(time) {
     const noise = audioCtx.createBufferSource();
-    noise.buffer = buffer;
+    noise.buffer = HAT_BUFFER;
     const hp = audioCtx.createBiquadFilter();
     hp.type = "highpass"; hp.frequency.value = 7000;
     const g = audioCtx.createGain();
@@ -848,12 +858,17 @@ function shuffle(arr) {
   return arr;
 }
 
+try { if (localStorage.getItem("tophat.muted") === "1") { music.muted = true; $("muteBtn").textContent = "🔇 Music Off"; } } catch (_) {}
 buildHome();
 probeTiltSupport();
 
 // Wire deck-selector controls
 $("surpriseBtn").addEventListener("click", pickRandomDeck);
-$("deckSearch").addEventListener("input", e => renderDecks(e.target.value));
+let _searchTimer = null;
+$("deckSearch").addEventListener("input", e => {
+  clearTimeout(_searchTimer);
+  _searchTimer = setTimeout(() => renderDecks(e.target.value), 150);
+});
 
 // ---------------- PWA: install prompt + service worker ----------------
 let deferredInstallPrompt = null;

@@ -2,7 +2,7 @@
   "name": "Heads Up Mob",
   "short_name": "Heads Up",
   "description": "Heads Up-style party game with tilt and tap controls.",
-  "start_url": "./game.html?pwa=1",
+  "start_url": "./index.html?pwa=1",
   "scope": "./",
   "display": "fullscreen",
   "orientation": "landscape",

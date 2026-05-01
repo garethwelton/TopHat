@@ -3,7 +3,7 @@
 const CACHE = 'headsup-mob-v1.8.2';
 const ASSETS = [
   './',
-  './game.html',
+  './index.html',
   './manifest.webmanifest',
   './icon-192.png',
   './icon-512.png',
