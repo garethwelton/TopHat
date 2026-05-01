@@ -370,19 +370,6 @@ function renderDecks(filter) {
     home.appendChild(sec);
   }
 
-  // Featured
-  const featured = DECKS.filter(d => d.featured);
-  if (featured.length) {
-    const sec = document.createElement("section");
-    sec.className = "deck-section";
-    sec.innerHTML = `<h3>✨ Featured</h3>`;
-    const row = document.createElement("div");
-    row.className = "deck-row";
-    featured.forEach(d => row.appendChild(deckCard(d, "featured")));
-    sec.appendChild(row);
-    home.appendChild(sec);
-  }
-
   // Browse by category — accordion
   const byCategory = {};
   DECKS.forEach(d => {
@@ -393,10 +380,10 @@ function renderDecks(filter) {
   browseHeader.textContent = "Browse all";
   home.appendChild(browseHeader);
 
-  Object.keys(byCategory).sort().forEach((cat, idx) => {
+  Object.keys(byCategory).sort().forEach(cat => {
     const sec = document.createElement("details");
     sec.className = "deck-section deck-cat";
-    sec.open = idx < 2; // First two categories expanded by default
+    sec.open = false; // All categories collapsed by default
     const summary = document.createElement("summary");
     summary.innerHTML = `<span>${cat}</span><span class="deck-cat-count">${byCategory[cat].length}</span>`;
     sec.appendChild(summary);
