@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<title>Heads Up Mob</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1a1a2e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Heads Up">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<style>
+  :root {
+    --bg: #1a1a2e;
+    --fg: #fff;
+    --good: #2ecc71;
+    --skip: #e67e22;
+    --accent: #f1c40f;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: var(--bg); color: var(--fg); overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: none; overscroll-behavior: none; }
+  body { display: flex; align-items: center; justify-content: center; }
+  .screen { width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 40px 24px; text-align: center; }
+  .screen.active { display: flex; }
+  /* Home + recap can be tall in portrait — allow scroll instead of clipping the header */
+  #homeScreen.active, #recapScreen.active { justify-content: flex-start; overflow-y: auto; padding-top: max(24px, env(safe-area-inset-top)); padding-bottom: max(24px, env(safe-area-inset-bottom)); -webkit-overflow-scrolling: touch; }
+  #homeScreen.active::after { content: ""; flex: 0 0 20px; }
+  h1 { font-size: clamp(40px, 7vw, 110px); margin-bottom: 24px; color: var(--accent); letter-spacing: -2px; }
+  h2 { font-size: clamp(26px, 4vw, 56px); margin-bottom: 20px; }
+  p { font-size: clamp(15px, 1.6vw, 22px); margin-bottom: 10px; opacity: 0.9; max-width: 700px; }
+  button { font: inherit; cursor: pointer; border: none; padding: 16px 28px; font-size: clamp(16px, 1.8vw, 22px); border-radius: 12px; background: var(--accent); color: #222; font-weight: 700; margin: 6px; transition: transform .1s; }
+  button:hover { transform: scale(1.04); }
+  button.secondary { background: #34495e; color: #fff; }
+  .categories { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; max-width: 900px; width: 100%; margin-top: 16px; }
+  .categories button { width: 100%; margin: 0; padding: 24px; }
+  .word { font-size: clamp(64px, 13vw, 200px); font-weight: 900; line-height: 1.05; padding: 0 20px; pointer-events: none; }
+  .timer { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); font-size: clamp(36px, 6vw, 76px); font-weight: 900; padding: 6px 22px; background: rgba(0,0,0,0.35); border-radius: 14px; pointer-events: none; }
+  .timer.warn { color: var(--skip); }
+  .timer.danger { color: #e74c3c; animation: pulse 0.6s infinite; }
+  @keyframes pulse { 50% { transform: translateX(-50%) scale(1.08); } }
+  .stats { position: fixed; bottom: 20px; left: 0; right: 0; display: flex; justify-content: space-around; font-size: clamp(18px, 2.4vw, 30px); font-weight: 700; pointer-events: none; }
+  .stats .got { color: var(--good); }
+  .stats .skip { color: var(--skip); }
+  #playScreen.flash-good { background: var(--good) !important; }
+  #playScreen.flash-skip { background: var(--skip) !important; }
+  #playScreen { transition: background 0.15s; position: relative; }
+  /* Invisible tap zones */
+  .zone { position: absolute; left: 0; right: 0; height: 50%; z-index: 10; cursor: pointer; }
+  .zone-top { top: 0; }
+  .zone-bottom { bottom: 0; }
+  .recap { max-width: 800px; width: 100%; }
+  .recap-list { text-align: left; max-height: 50vh; overflow-y: auto; margin: 18px 0; padding: 14px; background: rgba(0,0,0,0.25); border-radius: 12px; }
+  .recap-list div { padding: 6px 12px; font-size: 18px; display: flex; justify-content: space-between; }
+  .recap-list .got { color: var(--good); }
+  .recap-list .skip { color: var(--skip); }
+  .countdown { font-size: clamp(120px, 22vw, 320px); font-weight: 900; color: var(--accent); }
+  .footer-controls { position: fixed; bottom: 14px; right: 14px; display: flex; gap: 8px; z-index: 50; }
+  .footer-controls button { padding: 8px 14px; font-size: 13px; background: #34495e; color: #fff; }
+  .input-mode { position: fixed; top: 14px; left: 14px; font-size: 13px; opacity: 0.7; background: rgba(0,0,0,0.3); padding: 6px 10px; border-radius: 6px; pointer-events: none; }
+  .quit-btn { position: fixed; top: 14px; right: 14px; z-index: 30; padding: 8px 14px; font-size: 13px; background: rgba(0,0,0,0.4); color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; cursor: pointer; font-weight: 600; }
+  .quit-btn:hover { background: rgba(231,76,60,0.85); }
+  .debug-overlay { position: fixed; top: 60px; left: 14px; z-index: 40; font-family: ui-monospace, Menlo, monospace; font-size: 12px; background: rgba(0,0,0,0.75); color: #0f0; padding: 8px 10px; border-radius: 6px; line-height: 1.5; pointer-events: none; white-space: pre; display: none; }
+  .debug-overlay.on { display: block; }
+  /* Tilt progress edge glows — fill from each edge as the user tilts */
+  .tilt-glow { position: fixed; left: 0; right: 0; height: 0; pointer-events: none; z-index: 5; transition: height 70ms linear, opacity 120ms linear; opacity: 0.85; }
+  .tilt-glow-correct { bottom: 0; background: linear-gradient(to top, var(--good) 0%, rgba(46,204,113,0) 100%); }
+  .tilt-glow-skip    { top: 0;    background: linear-gradient(to bottom, var(--skip) 0%, rgba(230,126,34,0) 100%); }
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<section id="homeScreen" class="screen active">
+  <h1>🎩 Heads Up Mob</h1>
+  <p>Hold the device on your forehead. Teammates shout clues.</p>
+  <p id="controlsHint"><b>Tilt down</b> or <b>tap bottom half</b> = correct &nbsp;·&nbsp; <b>Tilt up</b> or <b>tap top half</b> = skip</p>
+  <p>Pick a category to start a 60-second round.</p>
+  <div class="categories" id="categoryList"></div>
+  <div style="margin-top:24px; display:flex; flex-wrap:wrap; justify-content:center;">
+    <button class="secondary" id="tiltBtn" style="display:none;">📱 Enable tilt controls</button>
+    <button class="secondary" id="muteBtn">🔊 Music On</button>
+    <button class="secondary" id="installBtn" style="display:none;">📲 Add to Home Screen</button>
+    <button class="secondary" id="iosInstallBtn" style="display:none;">📲 How to install</button>
+    <button class="secondary" id="debugBtn">🐞 Debug</button>
+    <button class="secondary" id="resetBtn">♻ Reset cache</button>
+  </div>
+</section>
+
+<!-- COUNTDOWN -->
+<section id="countdownScreen" class="screen">
+  <div class="countdown" id="countdownNum">3</div>
+  <p>Get ready…</p>
+</section>
+
+<!-- PLAY -->
+<section id="playScreen" class="screen">
+  <div class="zone zone-top" id="zoneTop"></div>
+  <div class="zone zone-bottom" id="zoneBottom"></div>
+  <div class="tilt-glow tilt-glow-skip" id="tiltGlowSkip"></div>
+  <div class="tilt-glow tilt-glow-correct" id="tiltGlowCorrect"></div>
+  <div class="input-mode" id="inputMode">Keyboard</div>
+  <button class="quit-btn" id="quitBtn" type="button">✕ Quit</button>
+  <pre class="debug-overlay" id="debugOverlay"></pre>
+  <div class="timer" id="timer">60</div>
+  <div class="word" id="wordDisplay">—</div>
+  <div class="stats">
+    <span class="got">✔ <span id="gotCount">0</span></span>
+    <span class="skip">↑ <span id="skipCount">0</span></span>
+  </div>
+</section>
+
+<!-- RECAP -->
+<section id="recapScreen" class="screen">
+  <div class="recap">
+    <h1>Time's Up!</h1>
+    <h2><span style="color:var(--good)">✔ <span id="finalGot">0</span></span> &nbsp; <span style="color:var(--skip)">↑ <span id="finalSkip">0</span></span></h2>
+    <div class="recap-list" id="recapList"></div>
+    <button id="playAgainBtn">Play Again</button>
+    <button class="secondary" id="homeBtn">Home</button>
+  </div>
+</section>
+
+<div class="footer-controls">
+  <button id="fullscreenBtn">⛶ Fullscreen</button>
+</div>
+
+<script>
+// ---------------- WORD LISTS ----------------
+const CATEGORIES = {
+  "🎬 Movies": ["Titanic","Star Wars","The Godfather","Jurassic Park","Frozen","Forrest Gump","The Matrix","Pulp Fiction","Avatar","Toy Story","Shrek","Jaws","Rocky","Gladiator","Inception","The Lion King","Harry Potter","Mean Girls","Home Alone","Back to the Future","Finding Nemo","The Avengers","Pirates of the Caribbean","E.T.","Top Gun","Dirty Dancing","Grease","Casablanca","Goodfellas","Mamma Mia"],
+  "🐘 Animals": ["Elephant","Kangaroo","Penguin","Octopus","Giraffe","Cheetah","Hedgehog","Platypus","Sloth","Walrus","Koala","Flamingo","Hippopotamus","Chameleon","Squirrel","Dolphin","Rhinoceros","Ostrich","Panda","Crocodile","Hummingbird","Tortoise","Meerkat","Llama","Otter","Toucan","Beaver","Lobster","Peacock","Armadillo"],
+  "🌟 Celebrities": ["Beyoncé","Tom Cruise","Oprah Winfrey","Elon Musk","Taylor Swift","David Attenborough","Lady Gaga","Keanu Reeves","Adele","Dwayne Johnson","Rihanna","Ed Sheeran","Will Smith","Jennifer Lawrence","Leonardo DiCaprio","Brad Pitt","Madonna","Snoop Dogg","Ariana Grande","Hugh Jackman","Emma Watson","Drake","Kanye West","Scarlett Johansson","Shakira","Daniel Craig","Zendaya","Harry Styles","Dolly Parton","Idris Elba"],
+  "🎭 Act It Out": ["Brushing teeth","Riding a horse","Climbing a ladder","Swatting a fly","Eating spaghetti","Playing guitar","Tying shoelaces","Driving a car","Catching a ball","Painting a wall","Mowing the lawn","Surfing","Yoga pose","Conducting an orchestra","Boxing","Fishing","Putting on socks","Opening a jar","Skiing","Sneezing","Sword fighting","Ice skating","Knitting","Doing the dishes","Walking a dog","Lifting weights","Vacuuming","Crying","Sleeping","Tightrope walking"],
+  "🍕 Food & Drink": ["Pizza","Sushi","Tacos","Spaghetti","Pancakes","Curry","Hamburger","Croissant","Ramen","Cheesecake","Smoothie","Avocado toast","Fish and chips","Lasagne","Hot dog","Doughnut","Bubble tea","Risotto","Espresso","Margarita","Pad Thai","Cornflakes","Brownie","Paella","Guacamole","Bagel","Tiramisu","Pretzel","Kebab","Pavlova"],
+  "👥 Humans": ["Brooke Wilds","Michel Moraes","Jessie Johnston","Vladislav Denishev","Chikako Suzuki","Hannah Terrill","Adam Silverstein","Sarah Jones","Alex Aspinall","Diana Dvorska","Owain","Dom Huxley","Ant Miller","Kirsty Burgoine","Adam Brown","Ewart Xia","Noel Tock","Vojislav","Aleks Ganev","Leyla","JC Marin","Esther Abraham","Wisdom Hambolu","Iliana Mustafa","Fatima","Rufaro Madamombe","Maria Manolova","Alexis Villegas","Simon","Will Davis","Firdaus Zahari","Sander van Dragt","Mehul Kaklotar","Gianna Legate","Megan Rose","Pam Ribeiro","Than Taintor","Tom J Nowell","Mike Little","Joe Bailey-Roberts","Joe Hoyle","Pawel Mikolajek","Jerico Aragon","Lorna Linke","Joeleen Kennedy","Petya Raykovska","Shipra Sood","Ivan K","Stuart Shields","Jon Ang"]
+};
+
+const ROUND_SECONDS = 60;
+
+const state = {
+  category: null, pool: [], current: null,
+  timeLeft: ROUND_SECONDS, gotCount: 0, skipCount: 0,
+  history: [], timerId: null, running: false, lastInput: 0,
+  tiltEnabled: false, tiltLocked: false
+};
+
+const $ = id => document.getElementById(id);
+const screens = ["homeScreen","countdownScreen","playScreen","recapScreen"];
+function show(id) { screens.forEach(s => $(s).classList.toggle("active", s === id)); }
+
+// ---------------- HOME ----------------
+function buildHome() {
+  const list = $("categoryList");
+  list.innerHTML = "";
+  Object.keys(CATEGORIES).forEach(cat => {
+    const btn = document.createElement("button");
+    btn.textContent = cat;
+    btn.onclick = () => startCountdown(cat);
+    list.appendChild(btn);
+  });
+}
+
+// ---------------- ROUND FLOW ----------------
+function startCountdown(cat) {
+  state.category = cat;
+  state.pool = shuffle([...CATEGORIES[cat]]);
+  state.gotCount = 0;
+  state.skipCount = 0;
+  state.history = [];
+  state.timeLeft = ROUND_SECONDS;
+  // Best-effort fullscreen + landscape lock so auto-rotate doesn't disrupt tilt mid-round.
+  // Requires user gesture (this function is called from a category button click).
+  if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+    document.documentElement.requestFullscreen().catch(()=>{});
+  }
+  setTimeout(tryLockLandscape, 200);
+  show("countdownScreen");
+  music.start();
+  let n = 3;
+  $("countdownNum").textContent = n;
+  beep(660, 0.15);
+  const iv = setInterval(() => {
+    n--;
+    if (n > 0) {
+      $("countdownNum").textContent = n;
+      beep(660, 0.15);
+    } else {
+      clearInterval(iv);
+      $("countdownNum").textContent = "GO!";
+      beep(990, 0.3);
+      setTimeout(startRound, 500);
+    }
+  }, 1000);
+}
+
+function startRound() {
+  show("playScreen");
+  state.running = true;
+  state.timeLeft = ROUND_SECONDS;
+  state.tiltLocked = false;
+  // Reset tilt state so each round starts with a fresh baseline.
+  // Without this, round 2+ uses round 1's neutral and feels broken.
+  neutralZ = null;
+  smoothedZ = null;
+  setGlow(0, 0);
+  // Brief warm-up so triggers don't fire before we have a stable neutral.
+  state.tiltLocked = true;
+  setTimeout(() => { state.tiltLocked = false; }, 600);
+  updateTimer();
+  updateStats();
+  updateInputModeLabel();
+  nextWord();
+  state.timerId = setInterval(tick, 1000);
+}
+
+function tick() {
+  state.timeLeft--;
+  updateTimer();
+  if (state.timeLeft <= 5 && state.timeLeft > 0) beep(880, 0.08);
+  if (state.timeLeft <= 0) endRound();
+}
+
+function updateTimer() {
+  const t = $("timer");
+  t.textContent = state.timeLeft;
+  t.classList.toggle("warn", state.timeLeft <= 15 && state.timeLeft > 5);
+  t.classList.toggle("danger", state.timeLeft <= 5);
+}
+function updateStats() {
+  $("gotCount").textContent = state.gotCount;
+  $("skipCount").textContent = state.skipCount;
+}
+function updateInputModeLabel() {
+  $("inputMode").textContent = state.tiltEnabled ? "Tilt + Tap" : "Tap / Keyboard";
+}
+
+function nextWord() {
+  if (state.pool.length === 0) state.pool = shuffle([...CATEGORIES[state.category]]);
+  state.current = state.pool.pop();
+  $("wordDisplay").textContent = state.current;
+}
+
+function flash(cls) {
+  const p = $("playScreen");
+  p.classList.add(cls);
+  setTimeout(() => p.classList.remove(cls), 180);
+}
+
+function markCorrect() {
+  if (!state.running || !state.current) return;
+  if (Date.now() - state.lastInput < 300) return;
+  state.lastInput = Date.now();
+  state.history.push({ word: state.current, result: "got" });
+  state.gotCount++;
+  beep(1200, 0.12);
+  flash("flash-good");
+  updateStats();
+  nextWord();
+}
+
+function markSkip() {
+  if (!state.running || !state.current) return;
+  if (Date.now() - state.lastInput < 300) return;
+  state.lastInput = Date.now();
+  state.history.push({ word: state.current, result: "skip" });
+  state.skipCount++;
+  beep(220, 0.18);
+  flash("flash-skip");
+  updateStats();
+  nextWord();
+}
+
+function endRound() {
+  state.running = false;
+  clearInterval(state.timerId);
+  buzzer();
+  $("finalGot").textContent = state.gotCount;
+  $("finalSkip").textContent = state.skipCount;
+  const list = $("recapList");
+  list.innerHTML = "";
+  state.history.forEach(h => {
+    const row = document.createElement("div");
+    row.className = h.result;
+    row.innerHTML = `<span>${h.word}</span><span>${h.result === "got" ? "✔" : "↑"}</span>`;
+    list.appendChild(row);
+  });
+  show("recapScreen");
+}
+
+// ---------------- INPUT: TAP ZONES ----------------
+$("zoneBottom").addEventListener("pointerdown", e => { e.preventDefault(); markCorrect(); });
+$("zoneTop").addEventListener("pointerdown", e => { e.preventDefault(); markSkip(); });
+
+// ---------------- INPUT: KEYBOARD ----------------
+document.addEventListener("keydown", e => {
+  if ($("playScreen").classList.contains("active")) {
+    if (e.code === "ArrowDown" || e.code === "Space") { e.preventDefault(); markCorrect(); }
+    else if (e.code === "ArrowUp") { e.preventDefault(); markSkip(); }
+    else if (e.code === "Escape") endRound();
+  } else if ($("recapScreen").classList.contains("active")) {
+    if (e.code === "Space" || e.code === "Enter") startCountdown(state.category);
+  }
+});
+
+// ---------------- INPUT: TILT (gravity-vector approach) ----------------
+// We watch DeviceMotionEvent.accelerationIncludingGravity. In the device's own
+// coordinate frame, the z-component of gravity tells us how far the screen is
+// tilted out of vertical — face-down (chin to chest, "correct") gives positive z,
+// face-up (head back, "skip") gives negative z. This works in any screen
+// orientation because z is always "out of the screen", regardless of rotation.
+//
+// We low-pass filter to suppress accelerometer noise, then compute progress
+// (0..1) toward each threshold and reflect that visually as edge glows.
+
+let neutralZ = null;
+let smoothedZ = null;
+let tiltEventReceived = false;
+const FORWARD_TARGET = 5.5; // m/s² of gravity-z change to trigger "correct"
+const BACK_TARGET    = 4.5; // m/s² to trigger "skip" (slightly easier — back tilt is harder physically)
+const NOISE_DEADBAND = 0.4;
+
+function setGlow(correctP, skipP) {
+  // Edge glow grows from each edge inward. Cap at 35vh so it doesn't dominate.
+  $("tiltGlowCorrect").style.height = (correctP * 35) + "vh";
+  $("tiltGlowSkip").style.height    = (skipP    * 35) + "vh";
+}
+
+function haptic(ms) {
+  if (navigator.vibrate) navigator.vibrate(ms || 40);
+}
+
+function onMotion(e) {
+  const g = e.accelerationIncludingGravity;
+  if (!g || g.z == null) return;
+  tiltEventReceived = true;
+  if (!state.running) { setGlow(0, 0); updateDebug(g, null, 0, 0); return; }
+
+  // Low-pass filter (0.7 old, 0.3 new) — smooths sensor noise while staying responsive
+  smoothedZ = (smoothedZ == null) ? g.z : smoothedZ * 0.7 + g.z * 0.3;
+  if (neutralZ == null) { neutralZ = smoothedZ; setGlow(0, 0); updateDebug(g, 0, 0, 0); return; }
+
+  const delta = smoothedZ - neutralZ;
+  const fwd = Math.max(0, delta - NOISE_DEADBAND);
+  const bck = Math.max(0, -delta - NOISE_DEADBAND);
+  const correctP = Math.min(1, fwd / FORWARD_TARGET);
+  const skipP    = Math.min(1, bck / BACK_TARGET);
+
+  if (!state.tiltLocked) setGlow(correctP, skipP);
+  updateDebug(g, delta, correctP, skipP);
+
+  if (state.tiltLocked) return;
+  if (correctP >= 1) {
+    state.tiltLocked = true;
+    haptic();
+    markCorrect();
+    setTimeout(() => { state.tiltLocked = false; neutralZ = null; smoothedZ = null; setGlow(0, 0); }, 700);
+  } else if (skipP >= 1) {
+    state.tiltLocked = true;
+    haptic();
+    markSkip();
+    setTimeout(() => { state.tiltLocked = false; neutralZ = null; smoothedZ = null; setGlow(0, 0); }, 700);
+  }
+}
+
+// Recalibrate baseline on screen rotation (handheld pose tends to change)
+window.addEventListener("orientationchange", () => { neutralZ = null; smoothedZ = null; });
+if (screen.orientation && screen.orientation.addEventListener) {
+  screen.orientation.addEventListener("change", () => { neutralZ = null; smoothedZ = null; });
+}
+
+function attachMotionListener() {
+  window.addEventListener("devicemotion", onMotion);
+  state.tiltEnabled = true;
+  $("tiltBtn").textContent = "✅ Tilt enabled";
+
+  setTimeout(() => {
+    if (!tiltEventReceived) {
+      state.tiltEnabled = false;
+      $("tiltBtn").textContent = "📱 Enable tilt controls";
+      const insecure = location.protocol !== "https:" && location.hostname !== "localhost";
+      alert(insecure
+        ? "Tilt didn't activate. Tilt requires the page to be served over HTTPS. Tap zones still work."
+        : "Tilt sensor didn't respond. This device may not have one — tap zones still work.");
+    }
+  }, 2000);
+}
+
+function enableTilt() {
+  // iOS 13+ requires permission for both motion and orientation. We use motion only,
+  // but request both so any future fallback works without re-prompting.
+  const reqMotion = (typeof DeviceMotionEvent !== "undefined" &&
+                     typeof DeviceMotionEvent.requestPermission === "function")
+                    ? DeviceMotionEvent.requestPermission() : Promise.resolve("granted");
+
+  reqMotion.then(resp => {
+    if (resp === "granted") attachMotionListener();
+    else alert("Tilt permission denied — tap zones still work.");
+  }).catch(() => alert("Couldn't enable tilt."));
+}
+
+function probeTiltSupport() {
+  if ("DeviceMotionEvent" in window && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+    $("tiltBtn").style.display = "inline-block";
+  }
+}
+$("tiltBtn").addEventListener("click", enableTilt);
+
+// ---------------- DEBUG OVERLAY ----------------
+let debugOn = new URLSearchParams(location.search).has("debug");
+function updateDebug(g, delta, correctP, skipP) {
+  if (!debugOn) return;
+  const angle = (screen.orientation && screen.orientation.angle) ?? window.orientation ?? 0;
+  $("debugOverlay").textContent =
+    "gx=" + g.x?.toFixed(2) +
+    " gy=" + g.y?.toFixed(2) +
+    " gz=" + g.z?.toFixed(2) +
+    "\nneutralZ=" + (neutralZ?.toFixed(2) ?? "-") +
+    " smZ=" + (smoothedZ?.toFixed(2) ?? "-") +
+    "\ndelta=" + (delta?.toFixed(2) ?? "-") +
+    " fwd=" + (correctP * 100).toFixed(0) + "%" +
+    " bck=" + (skipP * 100).toFixed(0) + "%" +
+    "\nangle=" + angle +
+    " tiltOn=" + state.tiltEnabled +
+    " evt=" + tiltEventReceived;
+}
+function applyDebugMode() { $("debugOverlay").classList.toggle("on", debugOn); }
+applyDebugMode();
+$("debugBtn").addEventListener("click", () => {
+  debugOn = !debugOn;
+  applyDebugMode();
+  $("debugBtn").textContent = debugOn ? "🐞 Debug ON" : "🐞 Debug";
+});
+
+// ---------------- RESET CACHE / FORCE REFRESH ----------------
+$("resetBtn").addEventListener("click", async () => {
+  if (!confirm("Clear cached files and reload?")) return;
+  try {
+    if ("serviceWorker" in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(r => r.unregister()));
+    }
+    if ("caches" in window) {
+      const keys = await caches.keys();
+      await Promise.all(keys.map(k => caches.delete(k)));
+    }
+  } catch (err) { console.warn(err); }
+  // Add a cachebuster query param so the browser HTTP cache is bypassed too
+  location.replace(location.pathname + "?v=" + Date.now());
+});
+
+// ---------------- ORIENTATION LOCK (round start) ----------------
+async function tryLockLandscape() {
+  try {
+    if (screen.orientation && typeof screen.orientation.lock === "function") {
+      await screen.orientation.lock("landscape");
+      return true;
+    }
+  } catch (e) { /* fails outside fullscreen / unsupported on iOS — silently ignore */ }
+  return false;
+}
+
+// ---------------- BUTTONS ----------------
+$("playAgainBtn").onclick = () => startCountdown(state.category);
+$("homeBtn").onclick = () => { show("homeScreen"); music.stop(); };
+$("quitBtn").addEventListener("pointerdown", e => { e.preventDefault(); e.stopPropagation(); if (state.running) endRound(); });
+$("fullscreenBtn").onclick = () => {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
+  else document.exitFullscreen();
+};
+$("muteBtn").onclick = () => {
+  music.muted = !music.muted;
+  $("muteBtn").textContent = music.muted ? "🔇 Music Off" : "🔊 Music On";
+  if (music.muted) music.stop();
+};
+
+// ---------------- AUDIO ----------------
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function beep(freq, dur) {
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.type = "square";
+  o.frequency.value = freq;
+  g.gain.setValueAtTime(0.08, audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
+  o.connect(g).connect(audioCtx.destination);
+  o.start();
+  o.stop(audioCtx.currentTime + dur);
+}
+
+function buzzer() {
+  for (let i = 0; i < 3; i++) setTimeout(() => beep(180, 0.4), i * 250);
+}
+
+// Cheesy synth-pop loop: I-V-vi-IV
+const music = (() => {
+  let masterGain = null, nextNoteTime = 0, schedulerId = null, step = 0, muted = false;
+  const chords = [
+    [261.63, 329.63, 392.00],
+    [392.00, 493.88, 587.33],
+    [440.00, 523.25, 659.25],
+    [349.23, 440.00, 523.25]
+  ];
+  const bassNotes = [130.81, 196.00, 220.00, 174.61];
+  const beatDur = 0.28;
+
+  function playNote(freq, time, dur, type, vol) {
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = type;
+    o.frequency.value = freq;
+    g.gain.setValueAtTime(0, time);
+    g.gain.linearRampToValueAtTime(vol, time + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, time + dur);
+    o.connect(g).connect(masterGain);
+    o.start(time);
+    o.stop(time + dur);
+  }
+  function playKick(time) {
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.frequency.setValueAtTime(120, time);
+    o.frequency.exponentialRampToValueAtTime(40, time + 0.12);
+    g.gain.setValueAtTime(0.4, time);
+    g.gain.exponentialRampToValueAtTime(0.001, time + 0.18);
+    o.connect(g).connect(masterGain);
+    o.start(time); o.stop(time + 0.2);
+  }
+  function playHat(time) {
+    const bufferSize = audioCtx.sampleRate * 0.05;
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = buffer;
+    const hp = audioCtx.createBiquadFilter();
+    hp.type = "highpass"; hp.frequency.value = 7000;
+    const g = audioCtx.createGain();
+    g.gain.setValueAtTime(0.08, time);
+    g.gain.exponentialRampToValueAtTime(0.001, time + 0.05);
+    noise.connect(hp).connect(g).connect(masterGain);
+    noise.start(time); noise.stop(time + 0.05);
+  }
+  function scheduler() {
+    while (nextNoteTime < audioCtx.currentTime + 0.2) {
+      const beat = step % 8;
+      const chordIdx = Math.floor(step / 8) % 4;
+      const chord = chords[chordIdx];
+      const bass = bassNotes[chordIdx];
+      const bassFreq = (beat % 2 === 0) ? bass : bass * 1.5;
+      playNote(bassFreq, nextNoteTime, beatDur * 1.1, "triangle", 0.18);
+      if (beat % 2 === 0) chord.forEach(f => playNote(f, nextNoteTime, beatDur * 0.9, "sawtooth", 0.04));
+      const melodyNote = chord[beat % 3] * 2;
+      playNote(melodyNote, nextNoteTime, beatDur * 0.6, "square", 0.05);
+      if (beat === 0 || beat === 4) playKick(nextNoteTime);
+      playHat(nextNoteTime);
+      nextNoteTime += beatDur;
+      step++;
+    }
+    schedulerId = setTimeout(scheduler, 50);
+  }
+  return {
+    get muted() { return muted; },
+    set muted(v) { muted = v; },
+    start() {
+      if (muted) return;
+      if (audioCtx.state === "suspended") audioCtx.resume();
+      if (schedulerId) return;
+      masterGain = audioCtx.createGain();
+      masterGain.gain.value = 0.35;
+      masterGain.connect(audioCtx.destination);
+      step = 0; nextNoteTime = audioCtx.currentTime + 0.05;
+      scheduler();
+    },
+    stop() {
+      if (schedulerId) { clearTimeout(schedulerId); schedulerId = null; }
+      if (masterGain) {
+        masterGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.1);
+        const mg = masterGain;
+        setTimeout(() => mg.disconnect(), 500);
+        masterGain = null;
+      }
+    }
+  };
+})();
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+buildHome();
+probeTiltSupport();
+
+// ---------------- PWA: install prompt + service worker ----------------
+let deferredInstallPrompt = null;
+window.addEventListener("beforeinstallprompt", e => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  const btn = $("installBtn");
+  btn.style.display = "inline-block";
+});
+
+$("installBtn").addEventListener("click", async () => {
+  if (!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  const { outcome } = await deferredInstallPrompt.userChoice;
+  deferredInstallPrompt = null;
+  if (outcome === "accepted") $("installBtn").style.display = "none";
+});
+
+window.addEventListener("appinstalled", () => {
+  $("installBtn").style.display = "none";
+});
+
+// iOS doesn't fire beforeinstallprompt — show a how-to button on iPhone/iPad Safari only,
+// and only if not already running as an installed PWA.
+const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+const isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+if (isIOS && !isStandalone) {
+  $("iosInstallBtn").style.display = "inline-block";
+  $("iosInstallBtn").addEventListener("click", () => {
+    alert("To install Heads Up Mob:\n\n1. Tap the Share button (□↑) at the bottom of Safari\n2. Scroll down and tap 'Add to Home Screen'\n3. Tap 'Add'\n\nIt will then launch fullscreen like a native app.");
+  });
+}
+
+// Register service worker (required for Android install prompt). Only when served over HTTPS or localhost.
+if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost" || location.hostname === "127.0.0.1")) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
