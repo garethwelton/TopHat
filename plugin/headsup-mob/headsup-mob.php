@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Heads Up Mob
  * Description: Heads Up-style party game. Use [headsup_game] on any page, or pick the "Heads Up Fullscreen" page template to redirect to the installable PWA.
- * Version: 1.7.0
+ * Version: 1.8.0
  * Author: Gareth Welton
  */
 
