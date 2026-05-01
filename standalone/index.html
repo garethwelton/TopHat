@@ -61,12 +61,20 @@
   .deck-card-compact .deck-desc { display: none; }
   .deck-empty { opacity: 0.6; padding: 12px; }
   .deck-browse-heading { font-size: 14px; opacity: 0.5; text-align: left; margin: 12px 4px 0; text-transform: uppercase; letter-spacing: 1px; }
-  .deck-cat { background: rgba(0,0,0,0.2); border-radius: 12px; padding: 10px 14px; }
+  .deck-cat { background: rgba(0,0,0,0.2); border-radius: 12px; padding: 10px 14px; border-left: 4px solid var(--cat-color, var(--accent)); transition: background .15s; }
+  .deck-cat[open] { background: rgba(0,0,0,0.32); }
   .deck-cat summary { cursor: pointer; padding: 6px 0; display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 16px; list-style: none; }
   .deck-cat summary::-webkit-details-marker { display: none; }
+  .deck-cat summary span:first-child { color: var(--cat-color, var(--accent)); }
   .deck-cat summary::after { content: "▾"; opacity: 0.5; transition: transform .2s; }
   .deck-cat[open] summary::after { transform: rotate(180deg); }
-  .deck-cat-count { background: rgba(255,255,255,0.1); font-size: 12px; padding: 2px 8px; border-radius: 10px; opacity: 0.7; }
+  .deck-cat-count { background: var(--cat-color, rgba(255,255,255,0.1)); color: #1a1a2e; font-weight: 700; font-size: 12px; padding: 2px 10px; border-radius: 10px; opacity: 0.9; }
+  /* Per-category accent colours */
+  .deck-cat[data-cat="TV & Film"]   { --cat-color: #e74c3c; }
+  .deck-cat[data-cat="Nature"]      { --cat-color: #2ecc71; }
+  .deck-cat[data-cat="People"]      { --cat-color: #f39c12; }
+  .deck-cat[data-cat="Activities"]  { --cat-color: #3498db; }
+  .deck-cat[data-cat="Lifestyle"]   { --cat-color: #9b59b6; }
   .deck-cat .deck-grid { margin-top: 10px; }
   .home-settings { width: 100%; max-width: 1000px; margin-top: 24px; display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.06); }
   .word { font-size: clamp(64px, 13vw, 200px); font-weight: 900; line-height: 1.05; padding: 0 20px; pointer-events: none; }
@@ -383,6 +391,7 @@ function renderDecks(filter) {
   Object.keys(byCategory).sort().forEach(cat => {
     const sec = document.createElement("details");
     sec.className = "deck-section deck-cat";
+    sec.dataset.cat = cat;
     sec.open = false; // All categories collapsed by default
     const summary = document.createElement("summary");
     summary.innerHTML = `<span>${cat}</span><span class="deck-cat-count">${byCategory[cat].length}</span>`;
